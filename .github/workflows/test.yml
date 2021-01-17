@@ -1,0 +1,39 @@
+name: test
+
+on:
+  push:
+    branches:
+      - "master"
+
+jobs:
+  first:
+    runs-on: ubuntu-latest
+    steps:
+      - name: fetch code
+        uses: actions/checkout@v2
+
+      - run:
+          expr 1 + 1 > output.log
+          
+      - name: Upload output file
+        uses: actions/upload-artifact@v1
+        with:
+          name: output-log-file
+          path: output.log
+  second:
+    needs: ['first']
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download a testlog
+        uses: actions/download-artifact@v2
+        with:
+          name: output-log-file
+      - name: Linux shell 
+        run: |
+          ls -F
+          for i in $(ls)
+          do
+            if [ -f $i ]; then
+              cat $i
+            fi
+          done
